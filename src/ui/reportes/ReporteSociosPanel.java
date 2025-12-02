@@ -1,14 +1,12 @@
 package ui.reportes;
 
 import servicios.ServicioReportes;
-import utilidades.CampoFecha;
 import utilidades.ValidadorUI;
 import ui.reportes.PanelReportes.ReportePanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.PrintWriter;
 import java.time.LocalDate;

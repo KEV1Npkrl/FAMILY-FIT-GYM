@@ -15,7 +15,6 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import java.util.List;
 
 /**
  * Panel para que los socios visualicen sus datos personales, membresía y plan

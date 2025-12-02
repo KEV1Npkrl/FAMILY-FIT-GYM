@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.WeekFields;
 import java.util.Locale;
 
 /**
@@ -224,7 +223,7 @@ public class CampoFecha extends JPanel {
             JPanel header = (JPanel) components[0];
             JLabel lblMesAno = (JLabel) ((JPanel) header).getComponent(1);
             
-            String mesAno = fechaSeleccionada.format(DateTimeFormatter.ofPattern("MMMM yyyy", new Locale("es", "ES")));
+            String mesAno = fechaSeleccionada.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.forLanguageTag("es-ES")));
             lblMesAno.setText(mesAno.substring(0, 1).toUpperCase() + mesAno.substring(1));
             
             // Actualizar la tabla del calendario
@@ -271,7 +270,7 @@ public class CampoFecha extends JPanel {
         // Actualizar header
         JPanel header = (JPanel) components[0];
         JLabel lblMesAno = (JLabel) ((JPanel) header).getComponent(1);
-        String mesAno = fechaSeleccionada.format(DateTimeFormatter.ofPattern("MMMM yyyy", new Locale("es", "ES")));
+        String mesAno = fechaSeleccionada.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.forLanguageTag("es-ES")));
         lblMesAno.setText(mesAno.substring(0, 1).toUpperCase() + mesAno.substring(1));
         
         // Actualizar tabla

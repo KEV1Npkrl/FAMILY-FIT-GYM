@@ -188,7 +188,7 @@ public class ValidadorUI {
         valor = valor.trim();
         
         try {
-            LocalDate fecha = LocalDate.parse(valor);
+            LocalDate.parse(valor);
             // Validaciones adicionales de fecha si es necesario
             return true;
         } catch (DateTimeParseException e) {

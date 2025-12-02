@@ -1,7 +1,6 @@
 package ui.seguridad;
 
 import dominio.SesionUsuario;
-import servicios.ServicioAutenticacion;
 import utilidades.ValidadorUI;
 
 import javax.swing.*;
@@ -17,10 +16,7 @@ public class PanelCambioPassword extends JPanel {
     private JButton btnCambiar;
     private JLabel lblUsuarioActual;
     
-    private ServicioAutenticacion servicioAuth;
-    
     public PanelCambioPassword() {
-        this.servicioAuth = new ServicioAutenticacion();
         construirUI();
     }
     

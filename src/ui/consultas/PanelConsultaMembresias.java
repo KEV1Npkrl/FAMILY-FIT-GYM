@@ -1,7 +1,6 @@
 package ui.consultas;
 
 import dominio.Membresia;
-import dominio.TipoDocumento;
 import servicios.ServicioMembresia;
 import utilidades.FiltrosEntrada;
 import utilidades.CampoFecha;
@@ -11,7 +10,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 

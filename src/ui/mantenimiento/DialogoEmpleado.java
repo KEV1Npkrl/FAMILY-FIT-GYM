@@ -2,7 +2,6 @@ package ui.mantenimiento;
 
 import dominio.Empleado;
 import dominio.TipoEmpleado;
-import dominio.SesionUsuario;
 import seguridad.ControladorPermisos;
 import utilidades.ValidadorUI;
 import utilidades.FiltrosEntrada;
@@ -95,8 +94,6 @@ public class DialogoEmpleado extends JDialog {
             dispose();
         });
     }
-
-    private void mensaje(String m) { JOptionPane.showMessageDialog(this, m); }
 
     public void setEmpleado(Empleado e) {
         esEdicion = true;

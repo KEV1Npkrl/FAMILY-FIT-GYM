@@ -210,7 +210,7 @@ public class PanelCambioPasswordAdmin extends JPanel {
         
         // Extraer documento del usuario seleccionado
         String textoUsuario = usuarioSeleccionado.toString();
-        String documento = textoUsuario.substring(0, textoUsuario.indexOf(" - "));
+        // String documento = textoUsuario.substring(0, textoUsuario.indexOf(" - "));
         
         // Confirmar acción
         int resultado = JOptionPane.showConfirmDialog(this,

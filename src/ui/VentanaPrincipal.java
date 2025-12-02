@@ -14,12 +14,10 @@ import ui.socios.PanelDatosSocio;
 import ui.socios.PanelEventosSocio;
 import ui.reportes.PanelReportes;
 import dominio.SesionUsuario;
-import servicios.ServicioAutenticacion;
 import seguridad.ControladorPermisos;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;

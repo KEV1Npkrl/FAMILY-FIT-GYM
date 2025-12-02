@@ -1,24 +1,19 @@
 package ui.reportes;
 
 import dominio.SesionUsuario;
-import servicios.ServicioReportes;
 import utilidades.ValidadorUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Panel principal de reportes con acceso a diferentes tipos de reportes
  */
 public class PanelReportes extends JPanel {
     
-    private ServicioReportes servicioReportes;
     private JTabbedPane tabbedPane;
     
     public PanelReportes() {
-        this.servicioReportes = new ServicioReportes();
         configurarPanel();
         inicializarComponentes();
     }

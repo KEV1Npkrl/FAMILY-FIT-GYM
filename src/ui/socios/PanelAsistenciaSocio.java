@@ -35,6 +35,7 @@ public class PanelAsistenciaSocio extends JPanel {
     private JButton btnMarcarAsistencia;
     private JTextArea txtHistorialAsistencias;
     private Timer reloj;
+    private hilos.HiloReloj relojHilo; // Nuevo hilo para el reloj
     
     public PanelAsistenciaSocio() {
         this.sesion = SesionUsuario.getInstance();
@@ -178,6 +179,11 @@ public class PanelAsistenciaSocio extends JPanel {
     }
     
     private void inicializarReloj() {
+        // Usar el nuevo HiloReloj en lugar de Timer
+        relojHilo = hilos.GestorHilos.crearRelojCompleto(lblHoraActual);
+        relojHilo.start();
+        
+        // También mantener el timer para compatibilidad con lblFechaActual
         reloj = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -402,6 +408,9 @@ public class PanelAsistenciaSocio extends JPanel {
     public void cerrarPanel() {
         if (reloj != null) {
             reloj.stop();
+        }
+        if (relojHilo != null) {
+            relojHilo.detener();
         }
     }
 }

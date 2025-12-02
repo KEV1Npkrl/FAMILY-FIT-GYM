@@ -69,8 +69,6 @@ public class DialogoPago extends JDialog {
         });
     }
 
-    private void mensaje(String m) { JOptionPane.showMessageDialog(this, m); }
-
     public boolean isAceptado() { return aceptado; }
     public String getDocumentoEmpleado() { return txtDocumentoEmpleado.getText().trim(); }
     public String getIdMetodoPago() { return ((MetodoPago)cboMetodo.getSelectedItem()).getIdMetodoPago(); }

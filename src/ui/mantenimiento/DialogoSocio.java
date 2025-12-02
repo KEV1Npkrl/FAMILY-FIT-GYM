@@ -66,8 +66,6 @@ public class DialogoSocio extends JDialog {
         });
     }
 
-    private void mensaje(String m) { JOptionPane.showMessageDialog(this, m); }
-
     public void setSocio(Socio s) {
         txtDocumento.setText(s.getNumDocumento());
         txtNombres.setText(s.getNombres());

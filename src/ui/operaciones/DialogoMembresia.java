@@ -77,8 +77,6 @@ public class DialogoMembresia extends JDialog {
         });
     }
 
-    private void mensaje(String m) { JOptionPane.showMessageDialog(this, m); }
-
     public boolean isAceptado() { return aceptado; }
     public String getDocumento() { return txtDocumento.getText().trim(); }
     public int getIdPlan() { return ((Plan)cboPlan.getSelectedItem()).getIdPlan(); }

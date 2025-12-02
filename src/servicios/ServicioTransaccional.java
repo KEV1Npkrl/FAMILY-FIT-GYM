@@ -5,7 +5,6 @@ import otros.Conexion;
 import utilidades.ValidadorEntidades;
 
 import java.sql.*;
-import java.time.LocalDate;
 
 /**
  * Servicio para operaciones transaccionales que involucran múltiples tablas

@@ -1,7 +1,6 @@
 package ui.socios;
 
 import dominio.SesionUsuario;
-import dominio.Socio;
 import servicios.ServicioSocio;
 import seguridad.ControladorPermisos;
 import utilidades.ValidadorUI;
@@ -11,7 +10,6 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Optional;
 import java.util.Arrays;
 
 /**

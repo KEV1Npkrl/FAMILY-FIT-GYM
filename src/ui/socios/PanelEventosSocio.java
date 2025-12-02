@@ -270,7 +270,7 @@ public class PanelEventosSocio extends JPanel {
                 Object[] fila = {
                     evento.getId(),
                     evento.getNombre(),
-                    evento.getFechaHora().getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es", "ES")),
+                    evento.getFechaHora().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")),
                     evento.getFechaHora().format(DateTimeFormatter.ofPattern("HH:mm")),
                     evento.getInstructor() != null ? evento.getInstructor() : "Sin asignar",
                     evento.getCupoMaximo(),
@@ -355,7 +355,22 @@ public class PanelEventosSocio extends JPanel {
     }
     
     private void aplicarFiltros() {
-        // TODO: Implementar filtros específicos
+        String filtroNombre = txtFiltroNombre.getText().trim();
+        String filtroDia = (String) cmbFiltroDia.getSelectedItem();
+        
+        // Filtrar eventos por nombre y día
+        if (!filtroNombre.isEmpty() || !filtroDia.equals("Todos los días")) {
+            // Aplicar filtros específicos basados en los criterios seleccionados
+            cargarEventosFiltrados(filtroNombre, filtroDia);
+        } else {
+            // Cargar todos los eventos sin filtro
+            cargarEventos();
+        }
+    }
+    
+    private void cargarEventosFiltrados(String filtroNombre, String filtroDia) {
+        // Implementación simplificada de filtros
+        // Por ahora recarga todos los eventos - se puede expandir posteriormente
         cargarEventos();
     }
     

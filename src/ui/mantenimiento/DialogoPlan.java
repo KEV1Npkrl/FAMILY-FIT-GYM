@@ -77,8 +77,6 @@ public class DialogoPlan extends JDialog {
         return true;
     }
 
-    private void mensaje(String m) { JOptionPane.showMessageDialog(this, m, "Validación", JOptionPane.WARNING_MESSAGE); }
-
     public boolean isAceptado() { return aceptado; }
 
     public void setPlan(Plan p) {

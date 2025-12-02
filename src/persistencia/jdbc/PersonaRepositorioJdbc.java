@@ -38,11 +38,11 @@ public class PersonaRepositorioJdbc implements PersonaRepositorio {
     @Override
     public List<Persona> listarTodos() {
         String sql = "SELECT NumDocumento, Nombres, Apellidos, PasswordHass, FechaRegistro, Celular, Correo FROM PERSONA";
-        List<Persona> lista = new ArrayList<>();
+        List<Persona> personas = new ArrayList<>();
         try (Connection cn = Conexion.iniciarConexion(); PreparedStatement ps = cn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) lista.add(mapear(rs));
+            while (rs.next()) personas.add(mapear(rs));
         } catch (SQLException e) { e.printStackTrace(); }
-        return lista;
+        return personas;
     }
 
     @Override

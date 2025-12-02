@@ -1,7 +1,5 @@
 package ui.seguridad;
 
-import dominio.SesionUsuario;
-
 import javax.swing.*;
 import java.awt.*;
 

@@ -2,8 +2,6 @@ package utilidades;
 
 import dominio.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * Validador que garantiza que los datos cumplan con las restricciones de la BD GIMNASIO

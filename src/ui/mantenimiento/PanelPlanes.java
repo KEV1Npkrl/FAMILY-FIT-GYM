@@ -5,7 +5,6 @@ import servicios.ServicioGestionPlanes;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class PanelPlanes extends JPanel {
     private final ServicioGestionPlanes servicio = new ServicioGestionPlanes();
@@ -36,10 +35,15 @@ public class PanelPlanes extends JPanel {
     }
 
     private void cargarDatos() {
-        SwingUtilities.invokeLater(() -> {
-            List<Plan> planes = servicio.listar();
-            modelo.setDatos(planes);
-        });
+        // Usar TareaBackground para cargar datos sin bloquear la UI
+        utilidades.TareaBackground.ejecutar(
+            () -> servicio.listar(), // Tarea en segundo plano
+            planes -> modelo.setDatos(planes), // Actualización UI en EDT
+            error -> {
+                error.printStackTrace();
+                mostrar("Error al cargar planes: " + error.getMessage());
+            }
+        );
     }
 
     private void crearPlan() {
