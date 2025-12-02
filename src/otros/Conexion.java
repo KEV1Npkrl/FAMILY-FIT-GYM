@@ -1,0 +1,38 @@
+package otros;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class Conexion {
+    
+    private static final String URL =
+        // Usar TCP/IP con puerto 1433 (puerto por defecto habilitado)
+        "jdbc:sqlserver://localhost:1433;" +
+        "databaseName=familyfitgym;" +
+        "encrypt=false;" +
+        "trustServerCertificate=true;" +
+        "loginTimeout=30;";
+
+    static {
+        try {
+            // Carga explícita del driver (útil si el auto-registro JDBC 4.0 no ocurre)
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Driver JDBC de SQL Server no encontrado en el classpath. Coloque mssql-jdbc-*.jar en la carpeta lib/ y reinicie.");
+        }
+    }
+
+    public static Connection iniciarConexion() {
+        try {
+            // Usar credenciales SQL específicas
+            Connection bd = DriverManager.getConnection(URL, "heidy", "fitgym@2025hei");
+            System.out.println("¡Conexión establecida con familyfitgym!");
+            return bd;
+        } catch (SQLException e) {
+            System.err.println("Error al conectar: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
