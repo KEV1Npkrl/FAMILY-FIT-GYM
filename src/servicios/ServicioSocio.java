@@ -2,7 +2,6 @@ package servicios;
 
 import dominio.Persona;
 import dominio.Socio;
-import dominio.TipoDocumento;
 import otros.Conexion;
 import persistencia.PersonaRepositorio;
 import persistencia.SocioRepositorio;
@@ -61,12 +60,12 @@ public class ServicioSocio {
      * Busca socios según criterios específicos
      */
     public List<Socio> buscarPorCriterios(String documento, String nombres, String apellidos, 
-                                         TipoDocumento tipoDocumento, LocalDate fechaDesde, LocalDate fechaHasta) {
+                                         LocalDate fechaDesde, LocalDate fechaHasta) {
         List<Socio> resultados = new ArrayList<>();
         
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT p.NumDocumento, p.Nombres, p.Apellidos, ");
-        sql.append("p.Celular, p.Correo, p.FechaRegistro, s.FechaIngreso ");
+        sql.append("p.Celular, p.Correo, p.FechaRegistro ");
         sql.append("FROM PERSONA p INNER JOIN SOCIO s ON p.NumDocumento = s.NumDocumento WHERE 1=1 ");
         
         List<Object> parametros = new ArrayList<>();
@@ -119,8 +118,6 @@ public class ServicioSocio {
                     socio.setCelular(rs.getString("Celular"));
                     socio.setCorreo(rs.getString("Correo"));
                     socio.setFechaRegistro(rs.getDate("FechaRegistro").toLocalDate());
-                    socio.setFechaIngreso(rs.getDate("FechaIngreso") != null ? 
-                        rs.getDate("FechaIngreso").toLocalDate() : null);
                     socio.setActivo(true); // Por defecto activo
                     
                     resultados.add(socio);

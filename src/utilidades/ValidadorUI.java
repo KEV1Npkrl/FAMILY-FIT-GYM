@@ -250,6 +250,13 @@ public class ValidadorUI {
     }
     
     /**
+     * Muestra mensaje de advertencia
+     */
+    public static void mostrarAdvertencia(Component padre, String mensaje) {
+        JOptionPane.showMessageDialog(padre, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
+    }
+    
+    /**
      * Muestra confirmación
      */
     public static boolean confirmar(Component padre, String mensaje) {

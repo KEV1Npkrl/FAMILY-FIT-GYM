@@ -2,9 +2,12 @@ package ui.reportes;
 
 import dominio.SesionUsuario;
 import utilidades.ValidadorUI;
+import reportes.PanelReportesEventos;
+import otros.Conexion;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
 
 /**
  * Panel principal de reportes con acceso a diferentes tipos de reportes
@@ -47,6 +50,19 @@ public class PanelReportes extends JPanel {
         // Pestaña de Reportes de Membresías
         ReporteMembresiasPanel reporteMembresias = new ReporteMembresiasPanel();
         tabbedPane.addTab("🎫 Reportes de Membresías", reporteMembresias);
+        
+        // Pestaña de Reportes de Eventos
+        try {
+            Connection conexion = Conexion.iniciarConexion();
+            PanelReportesEventos reporteEventos = new PanelReportesEventos(conexion);
+            tabbedPane.addTab("🎪 Reportes de Eventos", reporteEventos);
+        } catch (Exception e) {
+            System.err.println("Error al inicializar reportes de eventos: " + e.getMessage());
+            // Si hay error, agregar pestaña con mensaje de error
+            JPanel errorPanel = new JPanel(new BorderLayout());
+            errorPanel.add(new JLabel("Error al cargar reportes de eventos: " + e.getMessage(), SwingConstants.CENTER));
+            tabbedPane.addTab("🎪 Reportes de Eventos", errorPanel);
+        }
         
         add(tabbedPane, BorderLayout.CENTER);
         

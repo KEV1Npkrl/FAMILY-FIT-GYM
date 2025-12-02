@@ -21,4 +21,9 @@ public class MetodoPago {
 
     public boolean isEstadoActivo() { return estadoActivo; }
     public void setEstadoActivo(boolean estadoActivo) { this.estadoActivo = estadoActivo; }
+    
+    @Override
+    public String toString() {
+        return nombreMetodo;
+    }
 }

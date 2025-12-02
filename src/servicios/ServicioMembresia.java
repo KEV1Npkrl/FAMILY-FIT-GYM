@@ -74,7 +74,7 @@ public class ServicioMembresia {
         
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT m.IdMembresia, m.FechaInicio, m.FechaFin, m.Estado, ");
-        sql.append("m.NumDocumentoSocio, m.IdPlan, m.Precio, m.Activa ");
+        sql.append("m.NumDocumentoSocio, m.IdPlan, m.Precio ");
         sql.append("FROM MEMBRESIA m ");
         
         if (nombreSocio != null && !nombreSocio.trim().isEmpty()) {
@@ -91,15 +91,17 @@ public class ServicioMembresia {
         }
         
         if (nombreSocio != null && !nombreSocio.trim().isEmpty()) {
-            sql.append("AND (p.Nombres LIKE ? OR p.ApellidoPaterno LIKE ? OR p.ApellidoMaterno LIKE ?) ");
-            parametros.add("%" + nombreSocio.trim() + "%");
+            sql.append("AND (p.Nombres LIKE ? OR p.Apellidos LIKE ?) ");
             parametros.add("%" + nombreSocio.trim() + "%");
             parametros.add("%" + nombreSocio.trim() + "%");
         }
         
         if (activa != null) {
-            sql.append("AND m.Activa = ? ");
-            parametros.add(activa);
+            if (activa) {
+                sql.append("AND m.Estado = 'ACTIVO' ");
+            } else {
+                sql.append("AND m.Estado = 'VENCIDO' ");
+            }
         }
         
         if (fechaDesde != null) {
@@ -121,8 +123,6 @@ public class ServicioMembresia {
             for (int i = 0; i < parametros.size(); i++) {
                 if (parametros.get(i) instanceof LocalDate) {
                     ps.setDate(i + 1, java.sql.Date.valueOf((LocalDate) parametros.get(i)));
-                } else if (parametros.get(i) instanceof Boolean) {
-                    ps.setBoolean(i + 1, (Boolean) parametros.get(i));
                 } else {
                     ps.setString(i + 1, parametros.get(i).toString());
                 }
@@ -138,7 +138,6 @@ public class ServicioMembresia {
                     membresia.setNumDocumentoSocio(rs.getString("NumDocumentoSocio"));
                     membresia.setIdPlan(rs.getInt("IdPlan"));
                     membresia.setPrecio(rs.getBigDecimal("Precio"));
-                    membresia.setActiva(rs.getBoolean("Activa"));
                     
                     resultados.add(membresia);
                 }

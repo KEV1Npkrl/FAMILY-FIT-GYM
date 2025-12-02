@@ -53,4 +53,39 @@ public class ServicioEmpleado {
             try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
+    
+    /**
+     * Verifica si la contraseña proporcionada es correcta para el empleado
+     */
+    public boolean verificarPassword(String numDocumento, String password) {
+        try (Connection cn = Conexion.iniciarConexion();
+             PreparedStatement ps = cn.prepareStatement("SELECT PasswordHass FROM PERSONA WHERE NumDocumento=?")) {
+            ps.setString(1, numDocumento);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String passwordBD = rs.getString("PasswordHass");
+                    return passwordBD != null && passwordBD.equals(password);
+                }
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar contraseña: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Cambia la contraseña del empleado
+     */
+    public boolean cambiarPassword(String numDocumento, String nuevaPassword) {
+        try (Connection cn = Conexion.iniciarConexion();
+             PreparedStatement ps = cn.prepareStatement("UPDATE PERSONA SET PasswordHass=? WHERE NumDocumento=?")) {
+            ps.setString(1, nuevaPassword);
+            ps.setString(2, numDocumento);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al cambiar contraseña: " + e.getMessage());
+            return false;
+        }
+    }
 }

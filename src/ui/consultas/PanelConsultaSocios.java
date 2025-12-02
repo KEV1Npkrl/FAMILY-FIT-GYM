@@ -1,7 +1,6 @@
 package ui.consultas;
 
 import dominio.Socio;
-import dominio.TipoDocumento;
 import servicios.ServicioSocio;
 import utilidades.FiltrosEntrada;
 import utilidades.CampoFecha;
@@ -22,7 +21,6 @@ public class PanelConsultaSocios extends JPanel {
     private JTextField txtDocumento;
     private JTextField txtNombres;
     private JTextField txtApellidos;
-    private JComboBox<TipoDocumento> comboTipoDoc;
     private CampoFecha campoFechaDesde;
     private CampoFecha campoFechaHasta;
     private JTable tablaSocios;
@@ -73,15 +71,6 @@ public class PanelConsultaSocios extends JPanel {
             { setDocumentFilter(new FiltrosEntrada.SoloNumerosFilter(15)); }
         });
         panel.add(txtDocumento, gbc);
-        
-        gbc.gridx = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
-        panel.add(new JLabel("Tipo:"), gbc);
-        
-        gbc.gridx = 3; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        comboTipoDoc = new JComboBox<>(TipoDocumento.values());
-        comboTipoDoc.insertItemAt(null, 0);
-        comboTipoDoc.setSelectedIndex(0);
-        panel.add(comboTipoDoc, gbc);
         
         // Fila 2: Nombres y Apellidos
         gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
@@ -201,9 +190,6 @@ public class PanelConsultaSocios extends JPanel {
         txtDocumento.getDocument().addDocumentListener(busquedaTiempoReal);
         txtNombres.getDocument().addDocumentListener(busquedaTiempoReal);
         txtApellidos.getDocument().addDocumentListener(busquedaTiempoReal);
-        
-        // Filtro en tiempo real para combo de tipo documento
-        comboTipoDoc.addActionListener(e -> filtrarEnTiempoReal());
     }
     
     private void cargarDatosIniciales() {
@@ -224,7 +210,6 @@ public class PanelConsultaSocios extends JPanel {
             String documento = txtDocumento.getText().trim();
             String nombres = txtNombres.getText().trim();
             String apellidos = txtApellidos.getText().trim();
-            TipoDocumento tipoDoc = (TipoDocumento) comboTipoDoc.getSelectedItem();
             LocalDate fechaDesde = campoFechaDesde.getFecha();
             LocalDate fechaHasta = campoFechaHasta.getFecha();
             
@@ -241,7 +226,6 @@ public class PanelConsultaSocios extends JPanel {
                 documento.isEmpty() ? null : documento,
                 nombres.isEmpty() ? null : nombres,
                 apellidos.isEmpty() ? null : apellidos,
-                tipoDoc,
                 fechaDesde,
                 fechaHasta
             );
@@ -270,7 +254,6 @@ public class PanelConsultaSocios extends JPanel {
         String documento = txtDocumento.getText().trim().toLowerCase();
         String nombres = txtNombres.getText().trim().toLowerCase();
         String apellidos = txtApellidos.getText().trim().toLowerCase();
-        TipoDocumento tipoDoc = (TipoDocumento) comboTipoDoc.getSelectedItem();
         
         List<Socio> sociosFiltrados = todosLosSocios.stream()
             .filter(socio -> {
@@ -289,12 +272,6 @@ public class PanelConsultaSocios extends JPanel {
                 // Filtro por apellidos (coincidencia parcial)
                 if (!apellidos.isEmpty() && 
                     !socio.getApellidos().toLowerCase().contains(apellidos)) {
-                    return false;
-                }
-                
-                // Filtro por tipo de documento
-                if (tipoDoc != null && !tipoDoc.equals(TipoDocumento.DNI)) {
-                    // Por ahora solo maneja DNI, se puede extender
                     return false;
                 }
                 
@@ -326,7 +303,6 @@ public class PanelConsultaSocios extends JPanel {
         txtDocumento.setText("");
         txtNombres.setText("");
         txtApellidos.setText("");
-        comboTipoDoc.setSelectedIndex(0);
         campoFechaDesde.setFecha(null);
         campoFechaHasta.setFecha(null);
         
@@ -377,9 +353,6 @@ public class PanelConsultaSocios extends JPanel {
             writer.println("FILTROS APLICADOS:");
             if (!txtDocumento.getText().trim().isEmpty()) {
                 writer.println("- Documento: " + txtDocumento.getText());
-            }
-            if (comboTipoDoc.getSelectedItem() != null) {
-                writer.println("- Tipo Documento: " + comboTipoDoc.getSelectedItem());
             }
             if (!txtNombres.getText().trim().isEmpty()) {
                 writer.println("- Nombres: " + txtNombres.getText());

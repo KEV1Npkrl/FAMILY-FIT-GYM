@@ -293,6 +293,13 @@ public class CampoFecha extends JPanel {
      * Establecer fecha (solo permite fechas hasta hoy)
      */
     public void setFecha(LocalDate fecha) {
+        // Verificar que la fecha no sea null
+        if (fecha == null) {
+            txtFecha.setText("");
+            this.fechaActual = null;
+            return;
+        }
+        
         // Verificar que la fecha no sea posterior a hoy
         if (fecha.isAfter(LocalDate.now())) {
             JOptionPane.showMessageDialog(this, 

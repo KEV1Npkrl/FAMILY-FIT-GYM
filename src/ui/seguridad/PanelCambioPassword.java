@@ -93,51 +93,112 @@ public class PanelCambioPassword extends JPanel {
         String passwordNueva = new String(txtPasswordNueva.getPassword()).trim();
         String confirmarPassword = new String(txtConfirmarPassword.getPassword()).trim();
         
-        // Validaciones
-        if (!ValidadorUI.validarTexto(this, passwordActual, "Contraseña actual", 60, true)) return;
-        if (!ValidadorUI.validarTexto(this, passwordNueva, "Nueva contraseña", 60, true)) return;
-        if (!ValidadorUI.validarTexto(this, confirmarPassword, "Confirmación de contraseña", 60, true)) return;
+        // Limpiar arrays inmediatamente por seguridad
+        java.util.Arrays.fill(txtPasswordActual.getPassword(), ' ');
+        java.util.Arrays.fill(txtPasswordNueva.getPassword(), ' ');
+        java.util.Arrays.fill(txtConfirmarPassword.getPassword(), ' ');
         
-        // Validar longitud mínima
-        if (passwordNueva.length() < 6) {
-            JOptionPane.showMessageDialog(this, 
-                "La nueva contraseña debe tener al menos 6 caracteres", 
+        try {
+            // Validaciones
+            if (!ValidadorUI.validarTexto(this, passwordActual, "Contraseña actual", 60, true)) return;
+            if (!ValidadorUI.validarTexto(this, passwordNueva, "Nueva contraseña", 60, true)) return;
+            if (!ValidadorUI.validarTexto(this, confirmarPassword, "Confirmación de contraseña", 60, true)) return;
+            
+            // Validar longitud mínima
+            if (passwordNueva.length() < 6) {
+                JOptionPane.showMessageDialog(this, 
+                    "La nueva contraseña debe tener al menos 6 caracteres", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                txtPasswordNueva.requestFocus();
+                return;
+            }
+            
+            // Validar que las contraseñas coincidan
+            if (!passwordNueva.equals(confirmarPassword)) {
+                JOptionPane.showMessageDialog(this, 
+                    "Las contraseñas nuevas no coinciden.\n\n" +
+                    "Verifique que ambas contraseñas sean exactamente iguales:\n" +
+                    "• No debe haber espacios adicionales\n" +
+                    "• Mayúsculas y minúsculas deben coincidir\n" +
+                    "• Todos los caracteres especiales deben ser idénticos\n\n" +
+                    "Vuelva a escribir la confirmación de contraseña.", 
+                    "Error de Confirmación", JOptionPane.ERROR_MESSAGE);
+                txtConfirmarPassword.selectAll();
+                txtConfirmarPassword.requestFocus();
+                return;
+            }
+            
+            // Confirmar cambio
+            int resultado = JOptionPane.showConfirmDialog(this,
+                "¿Está seguro de que desea cambiar su contraseña?\n\n" +
+                "Esta acción no se puede deshacer.",
+                "Confirmar Cambio de Contraseña",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+            
+            if (resultado != JOptionPane.YES_OPTION) {
+                return;
+            }
+            
+            // Obtener información de sesión
+            SesionUsuario sesion = SesionUsuario.getInstance();
+            String documento = sesion.getDocumentoUsuario();
+            
+            // Verificar contraseña actual según tipo de usuario
+            boolean passwordCorrecta = false;
+            if (sesion.getTipoUsuario() == dominio.TipoUsuario.EMPLEADO) {
+                servicios.ServicioEmpleado servicioEmpleado = new servicios.ServicioEmpleado();
+                passwordCorrecta = servicioEmpleado.verificarPassword(documento, passwordActual);
+                
+                if (passwordCorrecta) {
+                    if (servicioEmpleado.cambiarPassword(documento, passwordNueva)) {
+                        JOptionPane.showMessageDialog(this,
+                            "Contraseña cambiada exitosamente.",
+                            "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                        limpiarCampos();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                            "Error al cambiar la contraseña. Inténtelo nuevamente.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else if (sesion.getTipoUsuario() == dominio.TipoUsuario.SOCIO) {
+                servicios.ServicioSocio servicioSocio = new servicios.ServicioSocio();
+                passwordCorrecta = servicioSocio.verificarPassword(documento, passwordActual);
+                
+                if (passwordCorrecta) {
+                    if (servicioSocio.cambiarPassword(documento, passwordNueva)) {
+                        JOptionPane.showMessageDialog(this,
+                            "Contraseña cambiada exitosamente.",
+                            "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                        limpiarCampos();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                            "Error al cambiar la contraseña. Inténtelo nuevamente.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+            
+            if (!passwordCorrecta) {
+                JOptionPane.showMessageDialog(this,
+                    "La contraseña actual es incorrecta.\n\n" +
+                    "Verifique que ha ingresado correctamente su contraseña actual.",
+                    "Error de Autenticación", JOptionPane.ERROR_MESSAGE);
+                txtPasswordActual.selectAll();
+                txtPasswordActual.requestFocus();
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Error inesperado al cambiar contraseña: " + e.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
-            txtPasswordNueva.requestFocus();
-            return;
+        } finally {
+            // Limpiar variables por seguridad
+            passwordActual = null;
+            passwordNueva = null;
+            confirmarPassword = null;
         }
-        
-        // Validar que las contraseñas coincidan
-        if (confirmarPassword.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Debe confirmar la nueva contraseña", 
-                "Error de Validación", JOptionPane.ERROR_MESSAGE);
-            txtConfirmarPassword.requestFocus();
-            return;
-        }
-        
-        if (!passwordNueva.equals(confirmarPassword)) {
-            JOptionPane.showMessageDialog(this, 
-                "Las contraseñas nuevas no coinciden.\n\n" +
-                "Verifique que ambas contraseñas sean exactamente iguales:\n" +
-                "• No debe haber espacios adicionales\n" +
-                "• Mayúsculas y minúsculas deben coincidir\n" +
-                "• Todos los caracteres especiales deben ser idénticos\n\n" +
-                "Vuelva a escribir la confirmación de contraseña.", 
-                "Error de Confirmación", JOptionPane.ERROR_MESSAGE);
-            txtConfirmarPassword.selectAll();
-            txtConfirmarPassword.requestFocus();
-            return;
-        }
-        
-        // Simular cambio de contraseña (aquí se implementaría la lógica real)
-        JOptionPane.showMessageDialog(this, 
-            "Función de cambio de contraseña en desarrollo.\\n" +
-            "Próximamente se implementará la actualización en base de datos.", 
-            "En desarrollo", JOptionPane.INFORMATION_MESSAGE);
-        
-        // Limpiar campos
-        limpiarCampos();
     }
     
     private void limpiarCampos() {

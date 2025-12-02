@@ -223,10 +223,6 @@ public class ValidadorEntidades {
             throw new IllegalArgumentException("FechaHoraEvento es requerida");
         }
         
-        if (programacion.getNumDocumento() == null || programacion.getNumDocumento().trim().isEmpty()) {
-            throw new IllegalArgumentException("NumDocumento (empleado) es requerido");
-        }
-        
         if (programacion.getIdEvento() <= 0) {
             throw new IllegalArgumentException("IdEvento debe ser mayor a 0");
         }

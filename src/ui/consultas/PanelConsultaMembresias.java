@@ -4,6 +4,7 @@ import dominio.Membresia;
 import servicios.ServicioMembresia;
 import utilidades.FiltrosEntrada;
 import utilidades.CampoFecha;
+import otros.Conexion;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,6 +13,7 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.sql.*;
 
 /**
  * Panel para consultas avanzadas de membresías con filtros
@@ -253,27 +255,50 @@ public class PanelConsultaMembresias extends JPanel {
     }
     
     private String determinarEstado(Membresia membresia) {
-        LocalDate hoy = LocalDate.now();
-        if (membresia.getFechaFin().isBefore(hoy)) {
-            return "Vencida";
-        } else if (membresia.isActiva()) {
-            return "Activa";
-        } else {
-            return "Suspendida";
-        }
+        // Usar directamente el estado de la base de datos
+        return membresia.getEstado();
     }
-    
+
     private String obtenerNombreSocio(String documento) {
-        // Implementar consulta para obtener nombre del socio
-        return "Socio " + documento; // Placeholder
+        try {
+            String sql = "SELECT CONCAT(Nombres, ' ', Apellidos) as NombreCompleto " +
+                        "FROM PERSONA WHERE NumDocumento = ?";
+            Connection conn = Conexion.iniciarConexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, documento);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getString("NombreCompleto");
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al obtener nombre del socio: " + e.getMessage());
+        }
+        return documento; // Fallback al documento si no se encuentra
     }
-    
+
     private String obtenerNombrePlan(int idPlan) {
-        // Implementar consulta para obtener nombre del plan
-        return "Plan " + idPlan; // Placeholder
-    }
-    
-    private void limpiarFiltros() {
+        try {
+            String sql = "SELECT NombrePlan FROM PLANES WHERE IdPlan = ?";
+            Connection conn = Conexion.iniciarConexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, idPlan);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getString("NombrePlan");
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al obtener nombre del plan: " + e.getMessage());
+        }
+        return "Plan " + idPlan; // Fallback al ID si no se encuentra
+    }    private void limpiarFiltros() {
         txtDocumentoSocio.setText("");
         txtNombreSocio.setText("");
         comboEstado.setSelectedIndex(0);

@@ -112,6 +112,17 @@ public class VentanaPrincipal extends JFrame {
             itemMetodosPago.addActionListener(e -> abrirModuloMaestros("metodos-pago"));
             menuMaestros.add(itemMetodosPago);
             
+            // Gestión de Eventos para Entrenadores y Admins
+            if (ControladorPermisos.puedeGestionarEventos()) {
+                JMenuItem itemEventos = new JMenuItem("Gestión de Eventos");
+                itemEventos.addActionListener(e -> abrirModuloMaestros("eventos"));
+                menuMaestros.add(itemEventos);
+                
+                JMenuItem itemProgramaciones = new JMenuItem("Programar Eventos");
+                itemProgramaciones.addActionListener(e -> abrirModuloMaestros("programaciones"));
+                menuMaestros.add(itemProgramaciones);
+            }
+            
             barraMenu.add(menuMaestros);
         }
 
@@ -277,6 +288,16 @@ public class VentanaPrincipal extends JFrame {
                 break;
             case "metodos-pago":
                 mostrarPanel(new ui.mantenimiento.PanelMetodosPago());
+                break;
+            case "eventos":
+                if (ControladorPermisos.verificarYMostrarError(() -> ControladorPermisos.puedeGestionarEventos(), this)) {
+                    mostrarPanel(new ui.mantenimiento.PanelEventos());
+                }
+                break;
+            case "programaciones":
+                if (ControladorPermisos.verificarYMostrarError(() -> ControladorPermisos.puedeGestionarEventos(), this)) {
+                    mostrarPanel(new ui.mantenimiento.PanelProgramaciones());
+                }
                 break;
             default:
                 JOptionPane.showMessageDialog(this, 

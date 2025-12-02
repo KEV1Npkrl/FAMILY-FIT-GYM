@@ -15,6 +15,10 @@ public class Membresia {
     private int idPlan;                // FK a PLANES(IdPlan)
     private BigDecimal precio;         // DECIMAL para el precio de la membresía
     private boolean activa;            // BOOLEAN para estado activo/inactivo
+    
+    // Campos adicionales para mostrar información
+    private String nombrePlan;        // Para mostrar en la UI
+    private String nombreSocio;       // Para mostrar en la UI
 
     public Membresia() {}
 
@@ -58,4 +62,10 @@ public class Membresia {
 
     public boolean isActiva() { return activa; }
     public void setActiva(boolean activa) { this.activa = activa; }
+    
+    public String getNombrePlan() { return nombrePlan; }
+    public void setNombrePlan(String nombrePlan) { this.nombrePlan = nombrePlan; }
+    
+    public String getNombreSocio() { return nombreSocio; }
+    public void setNombreSocio(String nombreSocio) { this.nombreSocio = nombreSocio; }
 }

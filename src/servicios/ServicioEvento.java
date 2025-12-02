@@ -4,7 +4,6 @@ import dominio.Evento;
 import otros.Conexion;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +14,11 @@ import java.util.Optional;
 public class ServicioEvento {
     
     /**
-     * Listar todos los eventos activos
+     * Listar todos los eventos
      */
     public List<Evento> listarActivos() {
         List<Evento> eventos = new ArrayList<>();
-        String sql = "SELECT * FROM EVENTO WHERE Activo=1 ORDER BY FechaHora";
+        String sql = "SELECT * FROM EVENTOS ORDER BY NombreEvento";
         
         try (Connection cn = Conexion.iniciarConexion();
              PreparedStatement ps = cn.prepareStatement(sql);
@@ -31,22 +30,41 @@ public class ServicioEvento {
             }
             
         } catch (SQLException e) {
-            System.err.println("Error al listar eventos activos: " + e.getMessage());
+            System.err.println("Error al listar eventos: " + e.getMessage());
         }
         
         return eventos;
     }
     
     /**
-     * Obtener un evento por ID
+     * Obtener todos los eventos
      */
-    public Optional<Evento> obtener(int id) {
-        String sql = "SELECT * FROM EVENTO WHERE Id=?";
+    public List<Evento> obtenerTodos() throws SQLException {
+        String sql = "SELECT IdEvento, NombreEvento, Descripcion FROM EVENTOS ORDER BY NombreEvento";
+        List<Evento> eventos = new ArrayList<>();
+        
+        try (Connection conn = Conexion.iniciarConexion();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                eventos.add(mapearEvento(rs));
+            }
+        }
+        
+        return eventos;
+    }
+    
+    /**
+     * Obtener evento por ID
+     */
+    public Optional<Evento> obtener(int idEvento) {
+        String sql = "SELECT * FROM EVENTOS WHERE IdEvento=?";
         
         try (Connection cn = Conexion.iniciarConexion();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             
-            ps.setInt(1, id);
+            ps.setInt(1, idEvento);
             
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -65,7 +83,7 @@ public class ServicioEvento {
      */
     public List<Evento> listarTodos() {
         List<Evento> eventos = new ArrayList<>();
-        String sql = "SELECT * FROM EVENTO ORDER BY FechaHora DESC";
+        String sql = "SELECT * FROM EVENTOS ORDER BY NombreEvento";
         
         try (Connection cn = Conexion.iniciarConexion();
              PreparedStatement ps = cn.prepareStatement(sql);
@@ -87,28 +105,25 @@ public class ServicioEvento {
      * Crear un nuevo evento
      */
     public boolean crear(Evento evento) {
-        String sql = "INSERT INTO EVENTO (Nombre, Descripcion, FechaHora, Duracion, Instructor, CupoMaximo, Activo) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // Obtener el siguiente ID disponible
+        int nuevoId = obtenerSiguienteId();
+        if (nuevoId == -1) {
+            return false;
+        }
+        
+        String sql = "INSERT INTO EVENTOS (IdEvento, NombreEvento, Descripcion) VALUES (?, ?, ?)";
         
         try (Connection cn = Conexion.iniciarConexion();
-             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = cn.prepareStatement(sql)) {
             
-            ps.setString(1, evento.getNombre());
-            ps.setString(2, evento.getDescripcion());
-            ps.setTimestamp(3, Timestamp.valueOf(evento.getFechaHora()));
-            ps.setInt(4, evento.getDuracion());
-            ps.setString(5, evento.getInstructor());
-            ps.setInt(6, evento.getCupoMaximo());
-            ps.setBoolean(7, evento.isActivo());
+            ps.setInt(1, nuevoId);
+            ps.setString(2, evento.getNombreEvento());
+            ps.setString(3, evento.getDescripcion());
             
             int filasAfectadas = ps.executeUpdate();
             
             if (filasAfectadas > 0) {
-                try (ResultSet keys = ps.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        evento.setId(keys.getInt(1));
-                    }
-                }
+                evento.setIdEvento(nuevoId);
                 return true;
             }
             
@@ -120,23 +135,38 @@ public class ServicioEvento {
     }
     
     /**
+     * Obtener el siguiente ID disponible
+     */
+    private int obtenerSiguienteId() {
+        String sql = "SELECT COALESCE(MAX(IdEvento), 0) + 1 as SiguienteId FROM EVENTOS";
+        
+        try (Connection cn = Conexion.iniciarConexion();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            if (rs.next()) {
+                return rs.getInt("SiguienteId");
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error al obtener siguiente ID: " + e.getMessage());
+        }
+        
+        return -1;
+    }
+    
+    /**
      * Actualizar un evento
      */
     public boolean actualizar(Evento evento) {
-        String sql = "UPDATE EVENTO SET Nombre=?, Descripcion=?, FechaHora=?, Duracion=?, " +
-                    "Instructor=?, CupoMaximo=?, Activo=? WHERE Id=?";
+        String sql = "UPDATE EVENTOS SET NombreEvento=?, Descripcion=? WHERE IdEvento=?";
         
         try (Connection cn = Conexion.iniciarConexion();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             
-            ps.setString(1, evento.getNombre());
+            ps.setString(1, evento.getNombreEvento());
             ps.setString(2, evento.getDescripcion());
-            ps.setTimestamp(3, Timestamp.valueOf(evento.getFechaHora()));
-            ps.setInt(4, evento.getDuracion());
-            ps.setString(5, evento.getInstructor());
-            ps.setInt(6, evento.getCupoMaximo());
-            ps.setBoolean(7, evento.isActivo());
-            ps.setInt(8, evento.getId());
+            ps.setInt(3, evento.getIdEvento());
             
             return ps.executeUpdate() > 0;
             
@@ -147,15 +177,15 @@ public class ServicioEvento {
     }
     
     /**
-     * Eliminar (desactivar) un evento
+     * Eliminar un evento
      */
-    public boolean eliminar(int id) {
-        String sql = "UPDATE EVENTO SET Activo=0 WHERE Id=?";
+    public boolean eliminar(int idEvento) {
+        String sql = "DELETE FROM EVENTOS WHERE IdEvento=?";
         
         try (Connection cn = Conexion.iniciarConexion();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             
-            ps.setInt(1, id);
+            ps.setInt(1, idEvento);
             return ps.executeUpdate() > 0;
             
         } catch (SQLException e) {
@@ -169,7 +199,7 @@ public class ServicioEvento {
      */
     public List<Evento> buscarPorNombre(String nombre) {
         List<Evento> eventos = new ArrayList<>();
-        String sql = "SELECT * FROM EVENTO WHERE Nombre LIKE ? AND Activo=1 ORDER BY FechaHora";
+        String sql = "SELECT * FROM EVENTOS WHERE NombreEvento LIKE ? ORDER BY NombreEvento";
         
         try (Connection cn = Conexion.iniciarConexion();
              PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -189,49 +219,16 @@ public class ServicioEvento {
         return eventos;
     }
     
-    /**
-     * Listar eventos de hoy en adelante
-     */
-    public List<Evento> listarProximos() {
-        List<Evento> eventos = new ArrayList<>();
-        String sql = "SELECT * FROM EVENTO WHERE FechaHora >= ? AND Activo=1 ORDER BY FechaHora";
-        
-        try (Connection cn = Conexion.iniciarConexion();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-            
-            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    eventos.add(mapearEvento(rs));
-                }
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Error al listar eventos próximos: " + e.getMessage());
-        }
-        
-        return eventos;
-    }
+
     
     /**
      * Mapear ResultSet a objeto Evento
      */
     private Evento mapearEvento(ResultSet rs) throws SQLException {
         Evento evento = new Evento();
-        evento.setId(rs.getInt("Id"));
-        evento.setNombre(rs.getString("Nombre"));
+        evento.setIdEvento(rs.getInt("IdEvento"));
+        evento.setNombreEvento(rs.getString("NombreEvento"));
         evento.setDescripcion(rs.getString("Descripcion"));
-        
-        Timestamp fechaHora = rs.getTimestamp("FechaHora");
-        if (fechaHora != null) {
-            evento.setFechaHora(fechaHora.toLocalDateTime());
-        }
-        
-        evento.setDuracion(rs.getInt("Duracion"));
-        evento.setInstructor(rs.getString("Instructor"));
-        evento.setCupoMaximo(rs.getInt("CupoMaximo"));
-        evento.setActivo(rs.getBoolean("Activo"));
         
         return evento;
     }

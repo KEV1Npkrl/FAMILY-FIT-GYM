@@ -138,10 +138,20 @@ public class ControladorPermisos {
     }
     
     /**
-     * Verifica si el usuario actual puede acceder a gestión de planes
+     * Verifica si el usuario actual puede gestionar planes
      */
     public static boolean puedeGestionarPlanes() {
         return esEmpleado();
+    }
+    
+    /**
+     * Verifica si el usuario actual puede gestionar eventos (Entrenadores y Admins)
+     */
+    public static boolean puedeGestionarEventos() {
+        if (!esEmpleado()) return false;
+        
+        // Solo Entrenadores y Admins pueden gestionar eventos
+        return esAdmin() || sesion.getTipoEmpleado() == dominio.TipoEmpleado.ENTRENADOR;
     }
     
     /**

@@ -64,6 +64,10 @@ public class SesionUsuario {
         return documentoUsuario;
     }
     
+    public String getNumDocumento() {
+        return documentoUsuario;
+    }
+    
     public String getNombresCompletos() {
         return nombres + " " + apellidos;
     }
@@ -86,6 +90,13 @@ public class SesionUsuario {
     
     public boolean isAutenticado() {
         return sesionActiva;
+    }
+    
+    public String getNombreCompleto() {
+        if (nombres != null && apellidos != null) {
+            return nombres + " " + apellidos;
+        }
+        return documentoUsuario; // Fallback
     }
     
     /**
