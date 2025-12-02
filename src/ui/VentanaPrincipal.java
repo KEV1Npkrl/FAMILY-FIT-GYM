@@ -12,6 +12,7 @@ import ui.consultas.PanelConsultaMembresias;
 import ui.socios.PanelAsistenciaSocio;
 import ui.socios.PanelDatosSocio;
 import ui.socios.PanelEventosSocio;
+import ui.reportes.PanelReportes;
 import dominio.SesionUsuario;
 import servicios.ServicioAutenticacion;
 import seguridad.ControladorPermisos;
@@ -162,6 +163,12 @@ public class VentanaPrincipal extends JFrame {
         if (ControladorPermisos.puedeVerReportes()) {
             JMenu menuReportes = new JMenu("Reportes");
             
+            JMenuItem itemReportesCompleto = new JMenuItem("Sistema de Reportes");
+            itemReportesCompleto.addActionListener(e -> abrirModuloReportes("completo"));
+            menuReportes.add(itemReportesCompleto);
+            
+            menuReportes.addSeparator();
+            
             JMenuItem itemReporteSocios = new JMenuItem("Reporte de Socios");
             itemReporteSocios.addActionListener(e -> abrirModuloReportes("socios"));
             menuReportes.add(itemReporteSocios);
@@ -173,6 +180,10 @@ public class VentanaPrincipal extends JFrame {
             JMenuItem itemReporteAsistencia = new JMenuItem("Reporte de Asistencia");
             itemReporteAsistencia.addActionListener(e -> abrirModuloReportes("asistencia"));
             menuReportes.add(itemReporteAsistencia);
+            
+            JMenuItem itemReporteMembresias = new JMenuItem("Reporte de Membresías");
+            itemReporteMembresias.addActionListener(e -> abrirModuloReportes("membresias"));
+            menuReportes.add(itemReporteMembresias);
             
             barraMenu.add(menuReportes);
         }
@@ -337,9 +348,39 @@ public class VentanaPrincipal extends JFrame {
     }
     
     private void abrirModuloReportes(String modulo) {
-        JOptionPane.showMessageDialog(this, 
-            "Módulo de reportes en desarrollo: " + modulo,
-            "Información", JOptionPane.INFORMATION_MESSAGE);
+        if (!ControladorPermisos.verificarYMostrarError(() -> ControladorPermisos.puedeVerReportes(), this)) {
+            return;
+        }
+        
+        switch (modulo.toLowerCase()) {
+            case "completo":
+                mostrarPanel(new PanelReportes());
+                break;
+            case "socios":
+                // Abrir módulo completo con pestaña de socios seleccionada
+                PanelReportes panelSocios = new PanelReportes();
+                panelSocios.getComponent(1); // Seleccionar pestaña específica si es necesario
+                mostrarPanel(panelSocios);
+                break;
+            case "ingresos":
+                // Abrir módulo completo con pestaña de ingresos seleccionada
+                PanelReportes panelIngresos = new PanelReportes();
+                mostrarPanel(panelIngresos);
+                break;
+            case "asistencia":
+                // Abrir módulo completo con pestaña de asistencias seleccionada
+                PanelReportes panelAsistencia = new PanelReportes();
+                mostrarPanel(panelAsistencia);
+                break;
+            case "membresias":
+                // Abrir módulo completo con pestaña de membresías seleccionada
+                PanelReportes panelMembresias = new PanelReportes();
+                mostrarPanel(panelMembresias);
+                break;
+            default:
+                mostrarPanel(new PanelReportes());
+                break;
+        }
     }
     
     private void cerrarSesion() {

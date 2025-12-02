@@ -30,6 +30,7 @@ public class PanelConsultaSocios extends JPanel {
     private JTable tablaSocios;
     private DefaultTableModel modeloTabla;
     private ServicioSocio servicioSocio;
+    private List<Socio> todosLosSocios; // Lista completa para filtrado en tiempo real
     
     public PanelConsultaSocios() {
         this.servicioSocio = new ServicioSocio();
@@ -191,16 +192,31 @@ public class PanelConsultaSocios extends JPanel {
         txtDocumento.addActionListener(e -> realizarBusqueda());
         txtNombres.addActionListener(e -> realizarBusqueda());
         txtApellidos.addActionListener(e -> realizarBusqueda());
+        
+        // Búsqueda en tiempo real mientras el usuario escribe
+        javax.swing.event.DocumentListener busquedaTiempoReal = new javax.swing.event.DocumentListener() {
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { filtrarEnTiempoReal(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { filtrarEnTiempoReal(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrarEnTiempoReal(); }
+        };
+        
+        txtDocumento.getDocument().addDocumentListener(busquedaTiempoReal);
+        txtNombres.getDocument().addDocumentListener(busquedaTiempoReal);
+        txtApellidos.getDocument().addDocumentListener(busquedaTiempoReal);
+        
+        // Filtro en tiempo real para combo de tipo documento
+        comboTipoDoc.addActionListener(e -> filtrarEnTiempoReal());
     }
     
     private void cargarDatosIniciales() {
         try {
-            List<Socio> socios = servicioSocio.obtenerTodos();
-            actualizarTabla(socios);
+            todosLosSocios = servicioSocio.obtenerTodos();
+            actualizarTabla(todosLosSocios);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                 "Error al cargar datos iniciales: " + e.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
+            todosLosSocios = new java.util.ArrayList<>();
         }
     }
     
@@ -247,6 +263,50 @@ public class PanelConsultaSocios extends JPanel {
         }
     }
     
+    /**
+     * Filtra los resultados en tiempo real según los criterios escritos
+     */
+    private void filtrarEnTiempoReal() {
+        if (todosLosSocios == null) return;
+        
+        String documento = txtDocumento.getText().trim().toLowerCase();
+        String nombres = txtNombres.getText().trim().toLowerCase();
+        String apellidos = txtApellidos.getText().trim().toLowerCase();
+        TipoDocumento tipoDoc = (TipoDocumento) comboTipoDoc.getSelectedItem();
+        
+        List<Socio> sociosFiltrados = todosLosSocios.stream()
+            .filter(socio -> {
+                // Filtro por documento (coincidencia parcial)
+                if (!documento.isEmpty() && 
+                    !socio.getNumDocumento().toLowerCase().contains(documento)) {
+                    return false;
+                }
+                
+                // Filtro por nombres (coincidencia parcial)
+                if (!nombres.isEmpty() && 
+                    !socio.getNombres().toLowerCase().contains(nombres)) {
+                    return false;
+                }
+                
+                // Filtro por apellidos (coincidencia parcial)
+                if (!apellidos.isEmpty() && 
+                    !socio.getApellidos().toLowerCase().contains(apellidos)) {
+                    return false;
+                }
+                
+                // Filtro por tipo de documento
+                if (tipoDoc != null && !tipoDoc.equals(TipoDocumento.DNI)) {
+                    // Por ahora solo maneja DNI, se puede extender
+                    return false;
+                }
+                
+                return true;
+            })
+            .collect(java.util.stream.Collectors.toList());
+        
+        actualizarTabla(sociosFiltrados);
+    }
+    
     private void actualizarTabla(List<Socio> socios) {
         modeloTabla.setRowCount(0);
         for (Socio socio : socios) {
@@ -271,7 +331,13 @@ public class PanelConsultaSocios extends JPanel {
         comboTipoDoc.setSelectedIndex(0);
         campoFechaDesde.setFecha(null);
         campoFechaHasta.setFecha(null);
-        cargarDatosIniciales();
+        
+        // Mostrar todos los socios nuevamente
+        if (todosLosSocios != null) {
+            actualizarTabla(todosLosSocios);
+        } else {
+            cargarDatosIniciales();
+        }
     }
     
     private void exportarResultados() {

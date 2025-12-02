@@ -80,35 +80,15 @@ public class PantallaLogin extends JFrame {
         // Sin tamaño fijo para escalarse según la ventana
         panel.setBackground(new Color(45, 45, 45));
         
-        // Intentar cargar imagen del gimnasio
+        // Etiqueta para la imagen
         lblImagen = new JLabel();
         lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
         lblImagen.setVerticalAlignment(SwingConstants.CENTER);
         
-        try {
-            // Buscar imagen en carpeta recursos
-            File archivoImagen = new File("recursos/gym-logo.jpg");
-            if (archivoImagen.exists()) {
-                ImageIcon icon = new ImageIcon(archivoImagen.getAbsolutePath());
-                // Redimensionar imagen proporcionalmente según tamaño disponible
-                Image img = icon.getImage().getScaledInstance(600, 400, Image.SCALE_SMOOTH);
-                lblImagen.setIcon(new ImageIcon(img));
-            } else {
-                // Placeholder si no hay imagen - tamaño escalable
-                lblImagen.setText("<html><div style='text-align: center;'>" +
-                                "<h1 style='color: white; font-size: 5vw; margin: 0;'>💪</h1>" +
-                                "<h2 style='color: white; font-size: 3vw; margin: 10px 0;'>FAMILY FIT GYM</h2>" +
-                                "<p style='color: #ccc; font-size: 1.2vw; margin: 5px 0;'>Tu gimnasio de confianza</p>" +
-                                "</div></html>");
-            }
-        } catch (Exception e) {
-            lblImagen.setText("<html><div style='text-align: center;'>" +
-                            "<h1 style='color: white; font-size: 5vw; margin: 0;'>💪</h1>" +
-                            "<h2 style='color: white; font-size: 3vw; margin: 10px 0;'>FAMILY FIT GYM</h2>" +
-                            "</div></html>");
-        }
-        
         panel.add(lblImagen, BorderLayout.CENTER);
+        
+        // Cargar la imagen inicial (Socio por defecto)
+        actualizarImagenLateral();
         
         // Footer con información y modo
         JLabel lblFooter = new JLabel("<html><div style='text-align: center; color: #888;'>" +
@@ -120,6 +100,38 @@ public class PantallaLogin extends JFrame {
         panel.add(lblFooter, BorderLayout.SOUTH);
         
         return panel;
+    }
+    
+    /**
+     * Actualiza la imagen mostrada en el panel lateral según el tipo de usuario.
+     */
+    private void actualizarImagenLateral() {
+        String nombreImagen = esLoginSocio ? "login_usuarios.jpeg" : "login_empleados.jpg";
+        
+        try {
+            // Buscar imagen en carpeta recursos
+            File archivoImagen = new File("recursos/" + nombreImagen);
+            
+            if (archivoImagen.exists()) {
+                ImageIcon icon = new ImageIcon(archivoImagen.getAbsolutePath());
+                // Redimensionar imagen proporcionalmente según tamaño disponible (aprox 600x400 base)
+                // Nota: Para un ajuste perfecto dinámico se requeriría un listener de redimensionamiento,
+                // pero esto mantiene la lógica original simple.
+                Image img = icon.getImage().getScaledInstance(600, 400, Image.SCALE_SMOOTH);
+                lblImagen.setIcon(new ImageIcon(img));
+                lblImagen.setText(""); // Limpiar texto placeholder si existe
+            } else {
+                // Placeholder si no encuentra la imagen específica
+                lblImagen.setIcon(null);
+                lblImagen.setText("<html><div style='text-align: center;'>" +
+                                "<h1 style='color: white; font-size: 5vw; margin: 0;'>💪</h1>" +
+                                "<h2 style='color: white; font-size: 3vw; margin: 10px 0;'>FAMILY FIT GYM</h2>" +
+                                "<p style='color: #ccc; font-size: 1.2vw; margin: 5px 0;'>" + nombreImagen + " no encontrada</p>" +
+                                "</div></html>");
+            }
+        } catch (Exception e) {
+            System.err.println("Error al cargar la imagen: " + e.getMessage());
+        }
     }
     
     private JPanel crearPanelLogin() {
@@ -285,6 +297,9 @@ public class PantallaLogin extends JFrame {
     
     private void alternarTipoLogin(ActionEvent e) {
         esLoginSocio = !esLoginSocio;
+        
+        // Actualizar la imagen según el nuevo tipo de login
+        actualizarImagenLateral();
         
         if (esLoginSocio) {
             lblTipoLogin.setText("ACCESO SOCIOS");
