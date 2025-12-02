@@ -296,7 +296,6 @@ public class CampoFecha extends JPanel {
         // Verificar que la fecha no sea null
         if (fecha == null) {
             txtFecha.setText("");
-            this.fechaActual = null;
             return;
         }
         

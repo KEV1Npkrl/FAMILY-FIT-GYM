@@ -116,8 +116,8 @@ public class PanelConsultaSocios extends JPanel {
         panel.setBorder(BorderFactory.createTitledBorder("Resultados"));
         
         // Crear tabla
-        String[] columnas = {"Documento", "Tipo", "Nombres", "Apellidos", 
-                           "Teléfono", "Email", "Fecha Registro", "Estado"};
+        String[] columnas = {"Documento", "Nombres", "Apellidos", 
+                           "Teléfono", "Email", "Fecha Registro"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -130,14 +130,12 @@ public class PanelConsultaSocios extends JPanel {
         tablaSocios.setRowSorter(new TableRowSorter<>(modeloTabla));
         
         // Configurar anchos de columnas
-        tablaSocios.getColumnModel().getColumn(0).setPreferredWidth(100);
-        tablaSocios.getColumnModel().getColumn(1).setPreferredWidth(80);
-        tablaSocios.getColumnModel().getColumn(2).setPreferredWidth(120);
-        tablaSocios.getColumnModel().getColumn(3).setPreferredWidth(120);
-        tablaSocios.getColumnModel().getColumn(4).setPreferredWidth(100);
-        tablaSocios.getColumnModel().getColumn(5).setPreferredWidth(150);
-        tablaSocios.getColumnModel().getColumn(6).setPreferredWidth(100);
-        tablaSocios.getColumnModel().getColumn(7).setPreferredWidth(80);
+        tablaSocios.getColumnModel().getColumn(0).setPreferredWidth(120); // Documento
+        tablaSocios.getColumnModel().getColumn(1).setPreferredWidth(150); // Nombres
+        tablaSocios.getColumnModel().getColumn(2).setPreferredWidth(150); // Apellidos
+        tablaSocios.getColumnModel().getColumn(3).setPreferredWidth(100); // Teléfono
+        tablaSocios.getColumnModel().getColumn(4).setPreferredWidth(180); // Email
+        tablaSocios.getColumnModel().getColumn(5).setPreferredWidth(100); // Fecha Registro
         
         JScrollPane scrollPane = new JScrollPane(tablaSocios);
         scrollPane.setPreferredSize(new Dimension(800, 300));
@@ -287,13 +285,11 @@ public class PanelConsultaSocios extends JPanel {
         for (Socio socio : socios) {
             Object[] fila = {
                 socio.getNumDocumento(),
-                "DNI",
                 socio.getNombres(),
                 socio.getApellidos(),
-                socio.getTelefono(),
-                socio.getEmail(),
-                socio.getFechaRegistro(),
-                socio.isActivo() ? "Activo" : "Inactivo"
+                socio.getCelular(),
+                socio.getCorreo(),
+                socio.getFechaRegistro()
             };
             modeloTabla.addRow(fila);
         }

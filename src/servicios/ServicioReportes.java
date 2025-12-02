@@ -21,12 +21,12 @@ public class ServicioReportes {
         String sql = """
             SELECT 
                 COUNT(*) as total_socios,
-                COUNT(CASE WHEN m.Estado = 'ACTIVA' THEN 1 END) as socios_activos,
-                COUNT(CASE WHEN m.Estado != 'ACTIVA' OR m.Estado IS NULL THEN 1 END) as socios_inactivos,
+                COUNT(CASE WHEN m.Estado = 'ACTIVO' THEN 1 END) as socios_activos,
+                COUNT(CASE WHEN m.Estado != 'ACTIVO' OR m.Estado IS NULL THEN 1 END) as socios_inactivos,
                 COUNT(CASE WHEN DATEDIFF(day, p.FechaRegistro, GETDATE()) <= 30 THEN 1 END) as nuevos_registros
             FROM SOCIO s
             INNER JOIN PERSONA p ON s.NumDocumento = p.NumDocumento
-            LEFT JOIN MEMBRESIA m ON s.NumDocumento = m.NumDocumento AND m.Estado = 'ACTIVA'
+            LEFT JOIN MEMBRESIA m ON s.NumDocumento = m.NumDocumento AND m.Estado = 'ACTIVO'
         """;
         
         try (Connection cn = Conexion.iniciarConexion();
@@ -347,9 +347,9 @@ public class ServicioReportes {
         String sql = """
             SELECT 
                 COUNT(*) as total_membresias,
-                COUNT(CASE WHEN Estado = 'ACTIVA' THEN 1 END) as membresias_activas,
-                COUNT(CASE WHEN Estado = 'VENCIDA' OR FechaFin < GETDATE() THEN 1 END) as membresias_vencidas,
-                COUNT(CASE WHEN Estado = 'ACTIVA' AND DATEDIFF(day, GETDATE(), FechaFin) BETWEEN 0 AND 30 THEN 1 END) as proximas_vencer
+                COUNT(CASE WHEN Estado = 'ACTIVO' THEN 1 END) as membresias_activas,
+                COUNT(CASE WHEN Estado = 'VENCIDO' OR FechaFin < GETDATE() THEN 1 END) as membresias_vencidas,
+                COUNT(CASE WHEN Estado = 'ACTIVO' AND DATEDIFF(day, GETDATE(), FechaFin) BETWEEN 0 AND 30 THEN 1 END) as proximas_vencer
             FROM MEMBRESIA
         """;
         
@@ -389,7 +389,7 @@ public class ServicioReportes {
             SELECT 
                 p.NombrePlan as planMembresia,
                 COUNT(*) as cantidad,
-                COUNT(CASE WHEN m.Estado = 'ACTIVA' THEN 1 END) as activas
+                COUNT(CASE WHEN m.Estado = 'ACTIVO' THEN 1 END) as activas
             FROM MEMBRESIA m
             INNER JOIN PLANES p ON m.IdPlan = p.IdPlan
             GROUP BY p.IdPlan, p.NombrePlan
@@ -430,7 +430,7 @@ public class ServicioReportes {
             INNER JOIN SOCIO s ON m.NumDocumento = s.NumDocumento
             INNER JOIN PERSONA p ON s.NumDocumento = p.NumDocumento
             INNER JOIN PLANES pl ON m.IdPlan = pl.IdPlan
-            WHERE m.Estado = 'ACTIVA' 
+            WHERE m.Estado = 'ACTIVO' 
                 AND DATEDIFF(day, GETDATE(), m.FechaFin) BETWEEN 0 AND 30
             ORDER BY m.FechaFin ASC
         """;

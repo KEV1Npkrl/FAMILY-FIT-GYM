@@ -1,7 +1,5 @@
 package dominio;
 
-import java.time.LocalDate;
-
 /**
  * Mapea la tabla EMPLEADO (PK y FK: NumDocumento)
  */
