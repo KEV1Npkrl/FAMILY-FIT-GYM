@@ -27,6 +27,11 @@ public class ServicioAsistencia {
     private final ServicioPlan servicioPlan = new ServicioPlan();
 
     public boolean registrarEntrada(String numDocumento) {
+        // Verificar si ya registró asistencia hoy
+        if (yaRegistroAsistenciaHoy(numDocumento)) {
+            return false; // Ya registró asistencia hoy
+        }
+        
         Optional<Membresia> om = memRepo.listarPorSocio(numDocumento).stream()
                 .filter(m -> m.getEstado()!=null && m.getEstado().toUpperCase().contains("ACT"))
                 .findFirst();
@@ -41,6 +46,27 @@ public class ServicioAsistencia {
         int nuevoId = siguienteId("ASISTENCIA", "IdAsistencia");
         Asistencia a = new Asistencia(nuevoId, numDocumento, ahora);
         return repo.insertar(a);
+    }
+
+    /**
+     * Verifica si el socio ya registró asistencia en el día actual
+     */
+    private boolean yaRegistroAsistenciaHoy(String numDocumento) {
+        String sql = "SELECT COUNT(*) FROM ASISTENCIA WHERE NumDocumento = ? AND CAST(FechaHoraEntrada AS DATE) = CAST(GETDATE() AS DATE)";
+        try (Connection cn = Conexion.iniciarConexion();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            
+            ps.setString(1, numDocumento);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar asistencia del día: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public List<Asistencia> listarPorSocio(String numDocumento) { return repo.listarPorSocio(numDocumento); }
