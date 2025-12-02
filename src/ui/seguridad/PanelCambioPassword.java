@@ -67,6 +67,13 @@ public class PanelCambioPassword extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         btnCambiar = new JButton("Cambiar Contraseña");
         btnCambiar.addActionListener(e -> procesarCambioPassword());
+        
+        // Listener para verificar coincidencia en tiempo real
+        txtConfirmarPassword.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { verificarCoincidenciaPassword(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { verificarCoincidenciaPassword(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { verificarCoincidenciaPassword(); }
+        });
         panelPrincipal.add(btnCambiar, gbc);
         
         // Información adicional
@@ -105,10 +112,24 @@ public class PanelCambioPassword extends JPanel {
         }
         
         // Validar que las contraseñas coincidan
+        if (confirmarPassword.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "Debe confirmar la nueva contraseña", 
+                "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            txtConfirmarPassword.requestFocus();
+            return;
+        }
+        
         if (!passwordNueva.equals(confirmarPassword)) {
             JOptionPane.showMessageDialog(this, 
-                "La nueva contraseña y su confirmación no coinciden", 
-                "Error", JOptionPane.ERROR_MESSAGE);
+                "Las contraseñas nuevas no coinciden.\n\n" +
+                "Verifique que ambas contraseñas sean exactamente iguales:\n" +
+                "• No debe haber espacios adicionales\n" +
+                "• Mayúsculas y minúsculas deben coincidir\n" +
+                "• Todos los caracteres especiales deben ser idénticos\n\n" +
+                "Vuelva a escribir la confirmación de contraseña.", 
+                "Error de Confirmación", JOptionPane.ERROR_MESSAGE);
+            txtConfirmarPassword.selectAll();
             txtConfirmarPassword.requestFocus();
             return;
         }
@@ -128,5 +149,31 @@ public class PanelCambioPassword extends JPanel {
         txtPasswordNueva.setText("");
         txtConfirmarPassword.setText("");
         txtPasswordActual.requestFocus();
+    }
+    
+    private void verificarCoincidenciaPassword() {
+        char[] nueva = txtPasswordNueva.getPassword();
+        char[] confirmar = txtConfirmarPassword.getPassword();
+        
+        if (confirmar.length > 0) {
+            boolean coinciden = java.util.Arrays.equals(nueva, confirmar);
+            
+            // Cambiar color de borde según coincidencia
+            if (coinciden) {
+                txtConfirmarPassword.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+                txtConfirmarPassword.setToolTipText("✓ Las contraseñas coinciden");
+            } else {
+                txtConfirmarPassword.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                txtConfirmarPassword.setToolTipText("✗ Las contraseñas no coinciden");
+            }
+        } else {
+            // Sin contenido - borde normal
+            txtConfirmarPassword.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            txtConfirmarPassword.setToolTipText("Confirme la nueva contraseña");
+        }
+        
+        // Limpiar arrays por seguridad
+        java.util.Arrays.fill(nueva, ' ');
+        java.util.Arrays.fill(confirmar, ' ');
     }
 }

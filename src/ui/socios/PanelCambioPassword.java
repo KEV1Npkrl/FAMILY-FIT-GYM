@@ -265,6 +265,30 @@ public class PanelCambioPassword extends JPanel {
     }
     
     private void verificarCoincidencia() {
+        char[] nueva = txtNuevaPassword.getPassword();
+        char[] confirmar = txtConfirmarPassword.getPassword();
+        
+        if (confirmar.length > 0) {
+            boolean coinciden = Arrays.equals(nueva, confirmar);
+            
+            // Cambiar color de borde según coincidencia
+            if (coinciden) {
+                txtConfirmarPassword.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+                txtConfirmarPassword.setToolTipText("✓ Las contraseñas coinciden");
+            } else {
+                txtConfirmarPassword.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                txtConfirmarPassword.setToolTipText("✗ Las contraseñas no coinciden");
+            }
+        } else {
+            // Sin contenido - borde normal
+            txtConfirmarPassword.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            txtConfirmarPassword.setToolTipText("Confirme la nueva contraseña");
+        }
+        
+        // Limpiar arrays por seguridad
+        Arrays.fill(nueva, ' ');
+        Arrays.fill(confirmar, ' ');
+        
         verificarHabilitarBoton();
     }
     
@@ -345,8 +369,21 @@ public class PanelCambioPassword extends JPanel {
             return false;
         }
         
+        // Validación mejorada de confirmación de contraseña
+        if (confirmar.trim().isEmpty()) {
+            ValidadorUI.mostrarError(this, "Debe confirmar la nueva contraseña");
+            txtConfirmarPassword.requestFocus();
+            return false;
+        }
+        
         if (!nueva.equals(confirmar)) {
-            ValidadorUI.mostrarError(this, "Las contraseñas nuevas no coinciden");
+            ValidadorUI.mostrarError(this, 
+                "Las contraseñas nuevas no coinciden.\n\n" +
+                "Verifique que ambas contraseñas sean exactamente iguales:\n" +
+                "• No debe haber espacios adicionales\n" +
+                "• Mayúsculas y minúsculas deben coincidir\n" +
+                "• Todos los caracteres especiales deben ser idénticos");
+            txtConfirmarPassword.selectAll();
             txtConfirmarPassword.requestFocus();
             return false;
         }
