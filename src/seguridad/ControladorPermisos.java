@@ -33,10 +33,31 @@ public class ControladorPermisos {
     }
     
     /**
-     * Verifica si el usuario actual puede gestionar otros usuarios
+     * Verifica si el usuario actual puede gestionar empleados (solo Admin)
      */
-    public static boolean puedeGestionarUsuarios() {
-        return esEmpleado();
+    public static boolean puedeGestionarEmpleados() {
+        return esAdmin();
+    }
+    
+    /**
+     * Verifica si el usuario actual puede cambiar contraseñas de otros usuarios (solo Admin)
+     */
+    public static boolean puedeCambiarPasswordDeOtros() {
+        return esAdmin();
+    }
+    
+    /**
+     * Verifica si el usuario actual puede agregar/modificar/eliminar empleados (solo Admin)
+     */
+    public static boolean puedeModificarEmpleados() {
+        return esAdmin();
+    }
+    
+    /**
+     * Verifica si el usuario actual puede cambiar roles de empleados (solo Admin)
+     */
+    public static boolean puedeCambiarRoles() {
+        return esAdmin();
     }
     
     /**
@@ -103,13 +124,6 @@ public class ControladorPermisos {
     }
     
     /**
-     * Verifica si el usuario actual puede acceder a gestión de empleados
-     */
-    public static boolean puedeGestionarEmpleados() {
-        return esEmpleado();
-    }
-    
-    /**
      * Verifica si el usuario actual puede acceder a gestión de membresías
      */
     public static boolean puedeGestionarMembresias() {
@@ -154,6 +168,15 @@ public class ControladorPermisos {
     }
     
     /**
+     * Verifica si el usuario actual es Admin
+     */
+    public static boolean esAdmin() {
+        return sesion.esSesionActiva() && 
+               sesion.getTipoUsuario() == TipoUsuario.EMPLEADO &&
+               sesion.esAdmin();
+    }
+    
+    /**
      * Mensaje de error estándar para acceso denegado
      */
     public static String getMensajeAccesoDenegado() {
@@ -161,6 +184,9 @@ public class ControladorPermisos {
             return "Como socio, no tienes permisos para acceder a esta funcionalidad.\n" +
                    "Solo puedes: marcar asistencia, ver tus datos personales, " +
                    "cambiar contraseña y registrarte en eventos.";
+        } else if (esEmpleado() && !esAdmin()) {
+            return "Solo los administradores pueden realizar esta acción.\n" +
+                   "Contacta con un administrador si necesitas acceso.";
         } else {
             return "No tienes permisos suficientes para realizar esta acción.";
         }

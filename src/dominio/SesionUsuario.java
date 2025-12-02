@@ -11,6 +11,7 @@ public class SesionUsuario {
     private String nombres;
     private String apellidos;
     private TipoUsuario tipoUsuario;
+    private TipoEmpleado tipoEmpleado; // Rol específico del empleado
     private LocalDateTime fechaInicio;
     private boolean sesionActiva;
     
@@ -30,6 +31,17 @@ public class SesionUsuario {
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.tipoUsuario = tipo;
+        this.tipoEmpleado = null; // Se establece después si es empleado
+        this.fechaInicio = LocalDateTime.now();
+        this.sesionActiva = true;
+    }
+    
+    public void iniciarSesionEmpleado(String documento, String nombres, String apellidos, TipoEmpleado tipoEmpleado) {
+        this.documentoUsuario = documento;
+        this.nombres = nombres;
+        this.apellidos = apellidos;
+        this.tipoUsuario = TipoUsuario.EMPLEADO;
+        this.tipoEmpleado = tipoEmpleado;
         this.fechaInicio = LocalDateTime.now();
         this.sesionActiva = true;
     }
@@ -39,6 +51,7 @@ public class SesionUsuario {
         this.nombres = null;
         this.apellidos = null;
         this.tipoUsuario = null;
+        this.tipoEmpleado = null;
         this.fechaInicio = null;
         this.sesionActiva = false;
     }
@@ -63,11 +76,23 @@ public class SesionUsuario {
         return tipoUsuario;
     }
     
+    public TipoEmpleado getTipoEmpleado() {
+        return tipoEmpleado;
+    }
+    
     public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
     
     public boolean isAutenticado() {
         return sesionActiva;
+    }
+    
+    /**
+     * Verifica si el usuario actual es Admin
+     */
+    public boolean esAdmin() {
+        return tipoUsuario == TipoUsuario.EMPLEADO && 
+               tipoEmpleado != null && tipoEmpleado.esAdmin();
     }
 }

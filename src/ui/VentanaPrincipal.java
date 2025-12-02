@@ -5,7 +5,7 @@ import ui.mantenimiento.PanelSocios;
 import ui.operaciones.PanelMembresias;
 import ui.operaciones.PanelPagos;
 import ui.mantenimiento.PanelEmpleados;
-import ui.seguridad.PanelUsuarios;
+import ui.seguridad.PanelCambioPasswordAdmin;
 import ui.autenticacion.PantallaLogin;
 import ui.consultas.PanelConsultaSocios;
 import ui.consultas.PanelConsultaMembresias;
@@ -65,15 +65,15 @@ public class VentanaPrincipal extends JFrame {
         // MENÚ SEGURIDAD (Común para todos)
         JMenu menuSeguridad = new JMenu("Seguridad");
         
-        // Solo empleados pueden gestionar usuarios
-        if (ControladorPermisos.puedeGestionarUsuarios()) {
-            JMenuItem itemUsuarios = new JMenuItem("Gestión de Usuarios");
-            itemUsuarios.addActionListener(e -> abrirModuloSeguridad("usuarios"));
-            menuSeguridad.add(itemUsuarios);
+        // Solo Admin puede cambiar contraseñas de otros usuarios
+        if (ControladorPermisos.puedeCambiarPasswordDeOtros()) {
+            JMenuItem itemCambioPasswordAdmin = new JMenuItem("Cambiar Contraseñas (Admin)");
+            itemCambioPasswordAdmin.addActionListener(e -> abrirModuloSeguridad("password-admin"));
+            menuSeguridad.add(itemCambioPasswordAdmin);
         }
         
         // Cambio de contraseña para todos
-        JMenuItem itemCambioPassword = new JMenuItem("Cambio de Contraseña");
+        JMenuItem itemCambioPassword = new JMenuItem("Cambiar Mi Contraseña");
         itemCambioPassword.addActionListener(e -> abrirModuloSeguridad("password"));
         menuSeguridad.add(itemCambioPassword);
 
@@ -167,24 +167,6 @@ public class VentanaPrincipal extends JFrame {
             itemReportesCompleto.addActionListener(e -> abrirModuloReportes("completo"));
             menuReportes.add(itemReportesCompleto);
             
-            menuReportes.addSeparator();
-            
-            JMenuItem itemReporteSocios = new JMenuItem("Reporte de Socios");
-            itemReporteSocios.addActionListener(e -> abrirModuloReportes("socios"));
-            menuReportes.add(itemReporteSocios);
-            
-            JMenuItem itemReporteIngresos = new JMenuItem("Reporte de Ingresos");
-            itemReporteIngresos.addActionListener(e -> abrirModuloReportes("ingresos"));
-            menuReportes.add(itemReporteIngresos);
-            
-            JMenuItem itemReporteAsistencia = new JMenuItem("Reporte de Asistencia");
-            itemReporteAsistencia.addActionListener(e -> abrirModuloReportes("asistencia"));
-            menuReportes.add(itemReporteAsistencia);
-            
-            JMenuItem itemReporteMembresias = new JMenuItem("Reporte de Membresías");
-            itemReporteMembresias.addActionListener(e -> abrirModuloReportes("membresias"));
-            menuReportes.add(itemReporteMembresias);
-            
             barraMenu.add(menuReportes);
         }
 
@@ -243,9 +225,9 @@ public class VentanaPrincipal extends JFrame {
     
     private void abrirModuloSeguridad(String modulo) {
         switch (modulo.toLowerCase()) {
-            case "usuarios":
-                if (ControladorPermisos.verificarYMostrarError(() -> ControladorPermisos.puedeGestionarUsuarios(), this)) {
-                    mostrarPanel(new PanelUsuarios());
+            case "password-admin":
+                if (ControladorPermisos.verificarYMostrarError(() -> ControladorPermisos.puedeCambiarPasswordDeOtros(), this)) {
+                    mostrarPanel(new PanelCambioPasswordAdmin());
                 }
                 break;
             case "password":
@@ -352,35 +334,8 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
         
-        switch (modulo.toLowerCase()) {
-            case "completo":
-                mostrarPanel(new PanelReportes());
-                break;
-            case "socios":
-                // Abrir módulo completo con pestaña de socios seleccionada
-                PanelReportes panelSocios = new PanelReportes();
-                panelSocios.getComponent(1); // Seleccionar pestaña específica si es necesario
-                mostrarPanel(panelSocios);
-                break;
-            case "ingresos":
-                // Abrir módulo completo con pestaña de ingresos seleccionada
-                PanelReportes panelIngresos = new PanelReportes();
-                mostrarPanel(panelIngresos);
-                break;
-            case "asistencia":
-                // Abrir módulo completo con pestaña de asistencias seleccionada
-                PanelReportes panelAsistencia = new PanelReportes();
-                mostrarPanel(panelAsistencia);
-                break;
-            case "membresias":
-                // Abrir módulo completo con pestaña de membresías seleccionada
-                PanelReportes panelMembresias = new PanelReportes();
-                mostrarPanel(panelMembresias);
-                break;
-            default:
-                mostrarPanel(new PanelReportes());
-                break;
-        }
+        // Siempre abrir el panel completo de reportes
+        mostrarPanel(new PanelReportes());
     }
     
     private void cerrarSesion() {

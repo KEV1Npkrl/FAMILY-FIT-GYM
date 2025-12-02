@@ -51,11 +51,20 @@ public class ServicioAutenticacion {
             if (empleadoOpt.isPresent()) {
                 Empleado empleado = empleadoOpt.get();
                 if (verificarPassword(empleado.getPasswordHass(), password)) {
-                    SesionUsuario.getInstance().iniciarSesion(
+                    // Determinar el tipo de empleado
+                    TipoEmpleado tipoEmpleado;
+                    try {
+                        tipoEmpleado = TipoEmpleado.fromDescripcion(empleado.getTipoEmpleado());
+                    } catch (IllegalArgumentException e) {
+                        // Si no es un tipo válido, asignar CAJERO por defecto
+                        tipoEmpleado = TipoEmpleado.CAJERO;
+                    }
+                    
+                    SesionUsuario.getInstance().iniciarSesionEmpleado(
                         empleado.getNumDocumento(), 
                         empleado.getNombres(), 
                         empleado.getApellidos(), 
-                        TipoUsuario.EMPLEADO
+                        tipoEmpleado
                     );
                     return true;
                 }
